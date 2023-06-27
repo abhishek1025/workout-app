@@ -1,6 +1,9 @@
 /* google font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&family=VT323&display=swap');
 
+@tailwind components;
+@tailwind utilities;
+
 /* layout */
 :root {
   --primary: #1aac83;
@@ -65,15 +68,10 @@ header a {
   color: #555;
 }
 
-.workout-details span {
+.workout-details .delete-edit-btns {
   position: absolute;
   top: 20px;
   right: 20px;
-  cursor: pointer;
-  background: #f1f1f1;
-  padding: 6px;
-  border-radius: 50%;
-  color: #333;
 }
 
 /* new workout form */

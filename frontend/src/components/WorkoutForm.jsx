@@ -1,6 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWorkoutsContext } from '../hooks/useWorkoutsContext';
 import { ACTION_TYPES } from '../context/workout.reducer';
+
+// const workoutInfos = {
+//     title: "",
+//     load: "",
+//     reps:""
+// }
 
 const WorkoutForm = () => {
     const [title, setTitle] = useState('');
@@ -10,7 +16,7 @@ const WorkoutForm = () => {
 
     const [emptyFields, setEmptyFields] = useState([]);
 
-    const { dispatch } = useWorkoutsContext();
+    const { updateWorkoutDetails, dispatch } = useWorkoutsContext();
 
     const handleSubmit = async (e) => {
 
@@ -18,13 +24,25 @@ const WorkoutForm = () => {
 
         const workout = { title, load, reps };
 
-        const res = await fetch('/api/workouts', {
-            method: "POST",
-            body: JSON.stringify(workout),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
+        console.log(updateWorkoutDetails)
+
+        const res = updateWorkoutDetails ?
+            await fetch(`/api/workouts/${updateWorkoutDetails[0]._id}`, {
+                method: "PATCH",
+                body: JSON.stringify(workout),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            :
+            await fetch('/api/workouts', {
+                method: "POST",
+                body: JSON.stringify(workout),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
 
         const json = await res.json()
 
@@ -41,9 +59,17 @@ const WorkoutForm = () => {
             setError(null);
             setEmptyFields([])
         }
-
-
     }
+
+    useEffect(() => {
+        if (updateWorkoutDetails) {
+            const { title, load, reps } = updateWorkoutDetails[0];
+            setTitle(title)
+            setLoad(load)
+            setReps(reps)
+        }
+
+    }, [updateWorkoutDetails])
 
     return (
         <form className="create" onSubmit={handleSubmit}>
@@ -72,7 +98,10 @@ const WorkoutForm = () => {
                 className={emptyFields.includes('reps') ? 'error' : ''}
             />
 
-            <button>Add Workout</button>
+
+            <button>
+                {updateWorkoutDetails ? "Update Workout" : "Add Workout"}
+            </button>
 
             {error && <div className='error'>{error}</div>}
 
