@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import WorkoutDetails from '../components/WorkoutDetails';
 import WorkoutForm from '../components/WorkoutForm';
 import { useWorkoutsContext } from '../hooks/useWorkoutsContext';
-import { ACTION_TYPES } from '../context/workout.reducer';
+import { ACTION_TYPES } from '../context/Workout/workout.reducer';
 import SearchBox from '../components/SearchBox';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const Home = () => {
 
@@ -11,19 +12,26 @@ const Home = () => {
   const [searchTitle, setSearchTitle] = useState("");
   const [filteredWorkouts, setFilteredWorkouts] = useState([])
 
+  const { user } = useAuthContext()
 
   useEffect(() => {
 
     const fetchWorkouts = async () => {
-      const res = await fetch('/api/workouts')
+
+      const res = await fetch('/api/workouts', {
+        headers: {
+          'Authorization': `Bearer ${user.token}`
+        }
+      })
       const jsonData = await res.json()
       if (res.ok) {
         dispatch({ type: ACTION_TYPES.SET_WORKOUTS, payload: jsonData });
       }
     }
 
-    fetchWorkouts()
-  }, [dispatch])
+    if (user) fetchWorkouts()
+
+  }, [dispatch, user])
 
   useEffect(() => {
 
@@ -36,7 +44,6 @@ const Home = () => {
   const handleSearch = (e) => {
     setSearchTitle(e.target.value);
   }
-
 
   return (
     <>

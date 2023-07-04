@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useWorkoutsContext } from '../hooks/useWorkoutsContext';
-import { ACTION_TYPES } from '../context/workout.reducer';
+import { ACTION_TYPES } from '../context/Workout/workout.reducer';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 // const workoutInfos = {
 //     title: "",
@@ -13,25 +14,33 @@ const WorkoutForm = () => {
     const [load, setLoad] = useState('');
     const [reps, setReps] = useState('');
     const [error, setError] = useState(null);
-
     const [emptyFields, setEmptyFields] = useState([]);
 
     const { updateWorkoutDetails, dispatch } = useWorkoutsContext();
+    const { user } = useAuthContext()
+
 
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
-        const workout = { title, load, reps };
+        console.log(user);
 
-        console.log(updateWorkoutDetails)
+        if (!user) {
+            setError('You must be logged in')
+            return
+        }
+
+        const workout = { title, load, reps };
 
         const res = updateWorkoutDetails ?
             await fetch(`/api/workouts/${updateWorkoutDetails[0]._id}`, {
                 method: "PATCH",
                 body: JSON.stringify(workout),
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+
                 }
             })
             :
@@ -39,6 +48,7 @@ const WorkoutForm = () => {
                 method: "POST",
                 body: JSON.stringify(workout),
                 headers: {
+                    'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'application/json'
                 }
             })

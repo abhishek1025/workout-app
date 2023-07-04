@@ -1,5 +1,5 @@
 import { useContext } from "react"
-import { WorkoutsContext } from "../context/workout.context";
+import { WorkoutsContext } from "../context/Workout/workout.context";
 
 export const useWorkoutsContext = () => {
 
